@@ -14,6 +14,6 @@ CSV_FILE = pathlib.Path(__file__).parents[1] / "data" / CONFIG["export"]["filena
 
 connection = sqlite3.connect(DB_FILE)
 df = pd.read_sql_query(f"SELECT * FROM {CONFIG['db']['table']}", connection)
-df.to_csv(CSV_FILE, index=False, sep=";", decimal=".")
+df.to_csv(CSV_FILE, index=False, sep=";", decimal=",")
 
 connection.close()
