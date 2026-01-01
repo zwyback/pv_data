@@ -99,4 +99,4 @@ if __name__ == "__main__":
         entry = fetch_data()
         print(entry)
         print("------------")
-        sleep(5)
+        sleep(CONFIG["api"]["wait_time_seconds"])
