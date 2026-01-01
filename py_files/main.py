@@ -22,7 +22,6 @@ class Entry:
     P_Grid: float = None
     P_Akku: float = None
     SOC: float = None
-    raw_json: str = None
 
     def __str__(self):
         return f" \
@@ -50,8 +49,7 @@ def init_database():
             P_Load REAL,
             P_Grid REAL,
             P_Akku REAL,
-            SOC,
-            raw_json TEXT
+            SOC
         )
     ''')
     
@@ -66,7 +64,6 @@ def fetch_data() -> Entry:
 
     data = requests.get(url).json()
     return_entry: Entry = Entry()
-    return_entry.raw_json = json.dumps(data)
 
 
     time_string: str = data[timestamp_field]['datestamp'] + " " + data[timestamp_field]['timestamp']
@@ -92,8 +89,8 @@ def add_db_entry(entry: Entry):
     conn.execute("PRAGMA synchronous=NORMAL;")
     cursor = conn.cursor()
     cursor.execute(f'''
-        INSERT INTO {CONFIG["db"]["table"]} (timestamp, P_PV, P_Load, P_Grid, P_Akku, SOC, raw_json)
-        VALUES ({entry.timestamp}, {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC}, '{entry.raw_json}')
+        INSERT INTO {CONFIG["db"]["table"]} (timestamp, P_PV, P_Load, P_Grid, P_Akku, SOC)
+        VALUES ({entry.timestamp}, {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC}')
     ''')
     conn.commit()
     conn.close()
