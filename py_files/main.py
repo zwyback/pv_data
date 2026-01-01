@@ -90,7 +90,7 @@ def add_db_entry(entry: Entry):
     cursor = conn.cursor()
     cursor.execute(f'''
         INSERT INTO {CONFIG["db"]["table"]} (timestamp, P_PV, P_Load, P_Grid, P_Akku, SOC)
-        VALUES ({entry.timestamp}, {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC}')
+        VALUES ({entry.timestamp}, {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC})
     ''')
     conn.commit()
     conn.close()
