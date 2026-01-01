@@ -16,7 +16,7 @@ DB_FILE = pathlib.Path(__file__).parents[1] / "data" / CONFIG["db"]["filename"]
 
 @dataclass
 class Entry:
-    timestamp: int = None
+    date: str = None
     P_PV: float = None
     P_Load: float = None
     P_Grid: float = None
@@ -25,7 +25,7 @@ class Entry:
 
     def __str__(self):
         return f" \
-            Timestamp: {self.timestamp} \n \
+            Date: {self.date} \n \
             P_PV: {self.P_PV} \n \
             P_Load: {self.P_Load} \n \
             P_Grid: {self.P_Grid} \n \
@@ -44,7 +44,7 @@ def init_database():
     cursor.execute(f'''
         CREATE TABLE IF NOT EXISTS {CONFIG["db"]["table"]} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            date TEXT,
             P_PV REAL,
             P_Load REAL,
             P_Grid REAL,
@@ -59,16 +59,14 @@ def init_database():
 
 def fetch_data() -> Entry:
     url: str = CONFIG['api']['url']
-    timestamp_field = CONFIG['api']["fields"]['timestamp_field']["field_name"]
     value_fields: list[str] = CONFIG["api"]["fields"]["value_fields"].keys()
 
     data = requests.get(url).json()
     return_entry: Entry = Entry()
 
-
-    time_string: str = data[timestamp_field]['datestamp'] + " " + data[timestamp_field]['timestamp']
-    time_format: str = "%d.%m.%Y %H:%M:%S"
-    return_entry.timestamp = str(dt.strptime(time_string, time_format).timestamp())
+    time_format = "%d.%m.%Y %H:%M:%S"
+    time_string: str = dt.now().strftime(time_format)
+    return_entry.date = time_string
 
     for field in value_fields:
         values = CONFIG["api"]["fields"]["value_fields"][field]
@@ -89,8 +87,8 @@ def add_db_entry(entry: Entry):
     conn.execute("PRAGMA synchronous=NORMAL;")
     cursor = conn.cursor()
     cursor.execute(f'''
-        INSERT INTO {CONFIG["db"]["table"]} (timestamp, P_PV, P_Load, P_Grid, P_Akku, SOC)
-        VALUES ({entry.timestamp}, {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC})
+        INSERT INTO {CONFIG["db"]["table"]} (Date, P_PV, P_Load, P_Grid, P_Akku, SOC)
+        VALUES ('{entry.date}', {entry.P_PV}, {entry.P_Load}, {entry.P_Grid}, {entry.P_Akku}, {entry.SOC})
     ''')
     conn.commit()
     conn.close()
