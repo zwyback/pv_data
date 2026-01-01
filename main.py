@@ -95,8 +95,10 @@ def add_db_entry(entry: Entry):
 
 if __name__ == "__main__":
     init_database()
+    WAIT_TIME = CONFIG["api"]["wait_time_seconds"]
     while (1):
         entry = fetch_data()
+        add_db_entry(entry)
         print(entry)
         print("------------")
-        sleep(CONFIG["api"]["wait_time_seconds"])
+        sleep(WAIT_TIME)
