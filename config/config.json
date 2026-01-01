@@ -17,5 +17,9 @@
     "db": {
         "filename": "pv_data.db",
         "table": "solar_data"
+    },
+
+    "export": {
+        "filename": "pv_data.csv"
     }
 }

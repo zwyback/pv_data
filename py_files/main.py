@@ -6,10 +6,13 @@ from dataclasses import dataclass
 import sqlite3
 import pathlib
 
-CONFIG_FILE = pathlib.Path(__file__).parent / "config.json"
+CONFIG_FILE = pathlib.Path(__file__).parents[1] / "config" / "config.json"
 
 with open(CONFIG_FILE) as f:
     CONFIG = json.load(f)
+
+DB_FILE = pathlib.Path(__file__).parents[1] / "data" / CONFIG["db"]["filename"]
+
 
 @dataclass
 class Entry:
@@ -36,7 +39,7 @@ class Entry:
 
 def init_database():
     """Erstellt die Datenbank-Tabelle falls nicht vorhanden"""
-    conn = sqlite3.connect(CONFIG["db"]["filename"])
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     
     cursor.execute(f'''
@@ -84,7 +87,9 @@ def fetch_data() -> Entry:
     return return_entry
 
 def add_db_entry(entry: Entry):
-    conn = sqlite3.connect(CONFIG["db"]["filename"])
+    conn = sqlite3.connect(DB_FILE)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     cursor = conn.cursor()
     cursor.execute(f'''
         INSERT INTO {CONFIG["db"]["table"]} (timestamp, P_PV, P_Load, P_Grid, P_Akku, SOC, raw_json)
